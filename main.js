@@ -1,109 +1,120 @@
-const game = document.getElementById("game");
-const scoreDisplay = document.getElementById("score");
-let score = 0;
+// https://opentdb.com/api.php?amount=10
 
-const genres = [
-  {
-    name: "Film & TV",
-    id: 11,
-  },
-  {
-    name: "Music",
-    id: 12,
-  },
+const question = document.getElementById("question");
+const options = document.querySelector(".quiz-choices");
+const _correctScore = document.getElementById("score");
+const _totalQuestion = document.getElementById("total-amount");
+const checkBtn = document.getElementById("check-answer");
+const playAgainBtn = document.getElementById("play-again");
+const result = document.getElementById("result");
 
-  {
-    name: "Games",
-    id: 15,
-  },
-  {
-    name: "General Knowledge",
-    id: 9,
-  },
-];
+let correctAnswer = "",
+  correctScore = (askedCount = 0),
+  totalQuestion = 10;
 
-const difficulty = ["easy", "medium", "hard"];
-
-addGenre = (genre) => {
-  const column = document.createElement("div");
-  column.classList.add("genre-column");
-  column.innerHTML = genre.name;
-  game.append(column);
-
-  difficulty.forEach((difficulty) => {
-    const card = document.createElement("div");
-    card.classList.add("card");
-    column.append(card);
-
-    if (difficulty === "easy") {
-      card.innerHTML = 100;
-    }
-    if (difficulty === "medium") {
-      card.innerHTML = 200;
-    }
-    if (difficulty === "hard") {
-      card.innerHTML = 300;
-    }
-
-    fetch(
-      `https://opentdb.com/api.php?amount=1&category=${genre.id}&difficulty=${difficulty}&type=boolean`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        card.setAttribute("data-question", data.results[0].question);
-        card.setAttribute("data-answer", data.results[0].correct_answer);
-
-        card.setAttribute("data-value", card.getInnerHTML());
-      })
-      .then(() => card.addEventListener("click", flipCard));
-  });
+eventListeners = () => {
+  checkBtn.addEventListener("click", checkAnswer);
+  playAgainBtn.addEventListener("click", restartQuiz);
 };
-genres.forEach((genre) => addGenre(genre));
 
-function flipCard() {
-  this.innerHTML = "";
-  this.style.fontSize = "1rem";
-  const questionDisplay = document.createElement("div");
-  const trueButton = document.createElement("button");
-  const falseButton = document.createElement("button");
-  trueButton.innerHTML = "True";
-  falseButton.innerHTML = "False";
-  trueButton.classList.add("correct-btn");
-  falseButton.classList.add("false-btn");
-  trueButton.addEventListener("click", getResult);
-  falseButton.addEventListener("click", getResult);
-  questionDisplay.innerHTML = this.getAttribute("data-question");
-  this.append(questionDisplay, trueButton, falseButton);
+document.addEventListener("DOMContentLoaded", () => {
+  loadQuestion();
+  eventListeners();
 
-  const allCards = Array.from(document.querySelectorAll(".card"));
-  allCards.forEach((card) => card.removeEventListener("click", flipCard));
+  result.innerHTML = "";
+  _totalQuestion.textContent = totalQuestion;
+  _correctScore.textContent = correctScore;
+});
+
+async function loadQuestion() {
+  checkBtn.disabled = false;
+  const APIUrl = "https://opentdb.com/api.php?amount=1";
+  const result = await fetch(`${APIUrl}`);
+  const data = await result.json();
+  console.log(data);
+  showQuestion(data.results[0]);
 }
 
-function getResult() {
-  const allCards = Array.from(document.querySelectorAll(".card"));
-  allCards.forEach((card) => card.addEventListener("click", flipCard));
+showQuestion = (data) => {
+  correctAnswer = data.correct_answer;
+  let incorrectAnswer = data.incorrect_answers;
+  let optionsList = incorrectAnswer;
+  optionsList.splice(
+    Math.floor(Math.random() * (incorrectAnswer.length + 1)),
+    0,
+    correctAnswer
+  );
 
-  const cardButton = this.parentElement;
-  if (cardButton.getAttribute("data-answer") === this.innerHTML) {
-    score = score + Number(cardButton.getAttribute("data-value"));
-    scoreDisplay.innerHTML = score;
-    cardButton.classList.add("correct");
+  question.innerHTML = `${data.question} <br> <span class = "category"> ${data.category} </span`;
+  // options.innerHTML = `${optionsList.map(option, index) => `
+  //     <li> ${index + 1}. <span> ${option} </span> </li>
+  //     `)}
+  //   `;
+  options.innerHTML = ` ${optionsList
+    .map(
+      (option, index) => `
+            <li> ${index + 1}. <span>${option}</span> </li>
+        `
+    )
+    .join("")}
+    `;
 
-    setTimeout(() => {
-      while (cardButton.firstChild) {
-        cardButton.removeChild(cardButton.lastChild);
+  selectOption();
+};
+
+selectOption = () =>
+  options.querySelectorAll("li").forEach((option) => {
+    option.addEventListener("click", () => {
+      if (options.querySelector(".selected-choice")) {
+        const activeOption = options.querySelector(".selected-choice");
+        activeOption.classList.remove("selected-choice");
       }
-      cardButton.innerHTML = cardButton.getAttribute("data-value");
-    }, 100);
-  } else {
-    cardButton.classList.add("false");
-    setTimeout(() => {
-      while (cardButton.firstChild) {
-        cardButton.removeChild(cardButton.lastChild);
-      }
-      cardButton.innerHTML = 0;
-    }, 100);
+      option.classList.add("selected-choice");
+    });
+  });
+
+checkAnswer = () => {
+  checkBtn.disabled = true;
+  if (options.querySelector(".selected-choice")) {
+    let selectedAnswer = options.querySelector(
+      ".selected-choice span"
+    ).textContent;
+    if (selectedAnswer == HTMLDecode(correctAnswer)) {
+      correctScore++;
+      result.innerHTML = `<p><i class = "fas fa-check"></i> Correct Answer!</p>`;
+    } else {
+      result.innerHTML = `<p><i class = "fas fa-times"></i> Incorrect Answer!</p> <small><b>Correct Answer: </b>${correctAnswer}</small>`;
+    }
+    checkCount();
   }
-  cardButton.removeEventListener("click", flipCard);
+};
+
+HTMLDecode = (textString) => {
+  let doc = new DOMParser().parseFromString(textString, "text/html");
+  return doc.documentElement.textContent;
+};
+
+function checkCount() {
+  askedCount++;
+  setCount();
+  if (askedCount == totalQuestion) {
+  } else {
+    setTimeout(function () {
+      loadQuestion();
+    }, 300);
+  }
+}
+
+function setCount() {
+  _totalQuestion.textContent = totalQuestion;
+  _correctScore.textContent = correctScore;
+}
+
+function restartQuiz() {
+  correctScore = askedCount = 0;
+  playAgainBtn.style.display = "none";
+  checkBtn.style.display = "block";
+  checkBtn.disabled = false;
+  setCount();
+  loadQuestion();
 }

@@ -4,14 +4,46 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trivia</title>
+    <title>A Quiz Game</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+      integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <h1>Let's Play Some Trivia!</h1>
-    <h2>Choose A Card!</h2>
-    <div id="game"></div>
-    <h2>Score:<span id="score">0</span></h2>
+  <body class="flex">
+    <main>
+      <div class="quiz-container">
+        <div class="quiz-top">
+          <h1 class="quiz-title">Trivia</h1>
+          <div class="quiz-score flex">
+            <span id="score"></span>/<span id="total-amount"></span>
+          </div>
+        </div>
+
+        <div class="quiz-body">
+          <h2 class="quiz-question" id="question">
+            <!-- sssssssssssssssssssssssssss <br />
+            <span class="category">Geography</span> -->
+          </h2>
+          <ul class="quiz-choices">
+            <!-- <li>1.</li>
+            <li>2.</li>
+            <li>3.</li>
+            <li>4.</li> -->
+          </ul>
+          <div id="result"></div>
+        </div>
+        <div class="quiz-footer">
+          <button type="button" id="check-answer">Check Answer</button>
+          <button type="button" id="play-again">Play Again</button>
+        </div>
+      </div>
+    </main>
     <script src="main.js"></script>
   </body>
 </html>
