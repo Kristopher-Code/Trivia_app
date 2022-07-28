@@ -1,0 +1,48 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(31, 160, 192);
+  color: white;
+  font-family: "Trebuchet MS", Arial;
+}
+
+.genre-column {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.card {
+  width: 200px;
+  height: 120px;
+  border-radius: 20px;
+  background-color: rgb(161, 233, 251);
+  text-align: center;
+  padding: 5px;
+  margin: 10px;
+  border: solid 1px rgba(255, 255, 255, 0.226);
+  font-size: 80px;
+}
+
+.correct {
+  background-color: green;
+}
+.false {
+  background-color: red;
+}
+
+.correct-btn {
+  background-color: rgba(0, 128, 0, 0.5);
+}
+
+.false-btn {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#game {
+  display: flex;
+}
